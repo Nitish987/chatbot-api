@@ -110,17 +110,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ),
     'DEFAULT_THROTTLE_RATES': {
-        'signup': '10/min',
-        'signup_verification': '100/min',
-        'resent_signup_otp': '10/min',
-        'login': '10/min',
-        'password_recovery': '10/min',
-        'password_recovery_verification': '100/min',
-        'password_recovery_new_password': '10/min',
-        'resent_password_recovery_otp': '10/min',
-        'authenticated_user': '1000/hour',
-        'change_names': '3/day',
-        'logout': '10/min',
+        'chatbot': '50/min',
     },
     'EXCEPTION_HANDLER': 'common.exception.exception_handler.ExceptionHandler'
 }
@@ -134,10 +124,15 @@ JWT_REFRESH_SECRET = getenv('JWT_REFRESH_SECRET')
 
 SERVER_ENC_KEY = getenv('SERVER_ENC_KEY')
 
+# External Server
+
+EXTERNAL_SERVER_HOST_URL = getenv('EXTERNAL_SERVER_HOST_URL')
+EXTERNAL_SERVER_API_KEY = getenv('EXTERNAL_SERVER_API_KEY')
+
 # Cors Configuration
 
 CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_HEADERS = (*default_headers, 'PROJECT_ID', 'API_KEY', 'CUSTOMER_TOKEN')
+CORS_ALLOW_HEADERS = (*default_headers, 'PROJECTID', 'APIKEY', 'CUSTOMERTOKEN')
 CORS_ALLOW_CREDENTIALS = True
 
 # Internationalization
