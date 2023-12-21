@@ -1,3 +1,4 @@
+import openai
 from pathlib import Path
 from dotenv import load_dotenv
 from os import getenv
@@ -28,6 +29,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'app.customer',
+    'app.chatbot',
 ]
 
 MIDDLEWARE = [
@@ -123,6 +125,9 @@ JWT_REFRESH_SECRET = getenv('JWT_REFRESH_SECRET')
 # Encryption Key
 
 SERVER_ENC_KEY = getenv('SERVER_ENC_KEY')
+
+# OpenAI
+openai.api_key = getenv('OPEN_AI')
 
 # External Server
 

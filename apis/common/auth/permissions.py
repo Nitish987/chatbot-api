@@ -17,6 +17,7 @@ class IsCustomerAuthenticated(permissions.BasePermission):
                 headers={'ASAK': settings.EXTERNAL_SERVER_API_KEY}
             )
             r = response.json()
+            request.project = r['data']['project']
             return r['success'] and request.META.get('HTTP_ORIGIN') in r['data']['project']['host']['urls']
         except Exception as e:
             Log.error(e)
