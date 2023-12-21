@@ -8,9 +8,9 @@ class _Chatbot:
         }
         self.__engines = ('C-QnA', 'OpenAI-ChatGPT', 'Google-Bard')
         self.__models = {
-            'C-QnA': ('C-QnA'),
-            'OpenAI-ChatGPT': ('gpt-3.5-turbo'),
-            'Google-Bard': ('Palm-2')
+            'C-QnA': ('C-QnA',),
+            'OpenAI-ChatGPT': ('gpt-3.5-turbo',),
+            'Google-Bard': ('Palm-2',)
         }
     
     @property

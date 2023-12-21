@@ -7,4 +7,5 @@ urlpatterns = [
     
     # API
     path('customer/', include('app.customer.urls')),
+    path('chatbot/', include('app.chatbot.urls')),
 ]
