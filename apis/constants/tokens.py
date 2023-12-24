@@ -15,5 +15,5 @@ class CookieToken:
 
 class TokenExpiry:
     ONE_DAY_EXPIRE_SECONDS = 1 * 24 * 60 * 60 # 1 day
-    ACCESS_EXPIRE_SECONDS = 60 * 2 # 2 minute
+    ACCESS_EXPIRE_SECONDS = 60 * 60 # 1 hour
     REFRESH_EXPIRE_SECONDS = 60 * 60

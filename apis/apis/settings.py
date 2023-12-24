@@ -112,7 +112,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ),
     'DEFAULT_THROTTLE_RATES': {
-        'chatbot': '50/min',
+        'chatbot': '15/min',
     },
     'EXCEPTION_HANDLER': 'common.exception.exception_handler.ExceptionHandler'
 }

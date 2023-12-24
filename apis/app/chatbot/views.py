@@ -1,16 +1,14 @@
 from rest_framework.views import APIView
 from common.utils.response import Response
 from common.debug.log import Log
-from common.auth.permissions import IsCustomerAuthenticated
+from common.auth.permissions import IsCustomerTokenValid
 from .services import ChatbotService
-from constants.tokens import TokenExpiry, CookieToken
 
 
 class Chatbot(APIView):
-    # TODO add permission for customer token authentication
-    # permission_classes = [IsCustomerAuthenticated]
+    permission_classes = [IsCustomerTokenValid]
 
-    def post(self, request):
+    def get(self, request):
         try:
             service = ChatbotService(
                 project_id=request.query_params.get('project_id'),
@@ -18,7 +16,7 @@ class Chatbot(APIView):
             )
             service.initialize(apikey=request.META.get('HTTP_AUTHORIZATION'))
             if service.is_valid:
-                answer = service.generate_response_accordingly(request.data.get('query'))
+                answer = service.generate_response_accordingly(request.query_params.get('query'))
                 return Response.success({'answer': answer})
             return Response.permission_denied()
         except Exception as e:
