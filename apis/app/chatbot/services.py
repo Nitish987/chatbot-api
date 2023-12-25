@@ -111,6 +111,7 @@ class ChatbotService:
     
     def get_chatbot_greetings(self):
         if self.is_valid:
+            update_billing(self.project_id, self.api_id)
             return self.data['greeting']
         return 'Unable to process.'
 
@@ -127,5 +128,5 @@ class ChatbotService:
         collection = f'emform_{self.data['emform']['id']}'
         db = firestore.client()
         db.collection(collection).document().set(data)
-        update_billing(self.project_id, self.api_id)
+        update_billing(self.project_id, self.data['emform']['api']['id'])
         return 'I got your details and we will be soon approaching you. Thanks.'
