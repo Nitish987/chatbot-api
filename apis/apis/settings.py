@@ -1,7 +1,9 @@
 import openai
+import firebase_admin
 from pathlib import Path
 from dotenv import load_dotenv
 from os import getenv
+from firebase_admin import credentials
 from corsheaders.defaults import default_headers
 
 load_dotenv()
@@ -86,6 +88,10 @@ DATABASES = {
 #         },
 #     }
 # }
+
+# Firebase
+creds = credentials.Certificate(str(BASE_DIR / 'firebase_credentials.json'))
+firebase_admin.initialize_app(creds)
 
 
 # Password validation

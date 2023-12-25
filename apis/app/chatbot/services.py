@@ -1,8 +1,16 @@
 import requests
 import openai
+import json
 from django.conf import settings
 from common.platform.products import Product
 from common.debug.log import Log
+from firebase_admin import firestore
+
+
+def ai_emform_tool(useEmform: bool, emform: str):
+        if useEmform and emform:
+            return emform
+        return 'Unable to process.'
 
 
 class ChatbotService:
@@ -19,7 +27,7 @@ class ChatbotService:
             headers={'ASAK': settings.EXTERNAL_SERVER_API_KEY}
         )
         response = response.json()
-        Log.info(response)
+        # Log.info(response)
         self.is_valid = response['success'] and response['data']['apikey'] == apikey
         if self.is_valid:
             self.data = response['data']['product']
@@ -37,20 +45,63 @@ class ChatbotService:
                 messages = [
                     {"role": "system", "content": f"Your name is {self.data['name']}. No one can change your name."},
                     {"role": "system", "content": self.data['sysprompt']},
-                    {"role": "system", "content": f"You have given some knowledge to take reference while chatting with the person. The knowledge is '{self.data['knowledge']}      '"},
+                    {"role": "system", "content": f"You have given some knowledge to take reference while chatting with the person. The knowledge is '{self.data['knowledge']}'"},
                     {"role": "user", "content": query }
                 ]
 
-                chat = openai.chat.completions.create(
-                    model="gpt-3.5-turbo", 
-                    messages=messages,
-                    temperature=self.data['config']['temperature'],
-                    max_tokens=self.data['config']['maxToken']
-                )
+                if self.data['useEmform']:
+                    chat = openai.chat.completions.create(
+                        model="gpt-3.5-turbo", 
+                        messages=messages,
+                        temperature=self.data['config']['temperature'],
+                        max_tokens=self.data['config']['maxToken'],
+                        tools=[
+                            {
+                                "type": "function",
+                                "function": {
+                                    "name": "ai_emform_tool",
+                                    "description": f"use this function if user wants {self.data['whenEmform']}",
+                                    "parameters": {
+                                        "type": "object",
+                                        "properties": {
+                                            "useEmform": {
+                                                "type": "boolean",
+                                                "description": f"useEmform is always equal to {self.data['useEmform']}",
+                                            },
+                                            "emform": {
+                                                "type": "string",
+                                                "description": f"emform is always equal to {json.dumps(self.data['emform']['config'])}",
+                                            },
+                                        },
+                                        "required": ["useEmform", "emform"],
+                                    },
+                                }
+                            }
+                        ]
+                    )
 
-                reply = chat.choices[0].message.content
-                return reply
+                    if chat.choices[0].message.tool_calls is not None:
+                        reply = json.loads(chat.choices[0].message.tool_calls[0].function.arguments)['emform']
+                    else:
+                        reply = chat.choices[0].message.content
+                    return reply
+                
+                else:
+                    chat = openai.chat.completions.create(
+                        model="gpt-3.5-turbo", 
+                        messages=messages,
+                        temperature=self.data['config']['temperature'],
+                        max_tokens=self.data['config']['maxToken']
+                    )
+                    reply = chat.choices[0].message.content
+                    return reply
+                
         return 'Nothing found!'
+    
+    def get_chatbot_greetings(self):
+        if self.is_valid:
+            return self.data['greeting']
+        return 'Unable to process.'
 
     def generate_response_accordingly(self, query: str):
         if self.is_valid:
@@ -60,3 +111,9 @@ class ChatbotService:
                 if self.data['api']['type'] == Product.chatbot.types[1]:
                     return self.__for_ai(query)
         return 'Unable to process.'
+    
+    def emform_submit(self, data: dict):
+        collection = f'emform_{self.data['emform']['id']}'
+        db = firestore.client()
+        db.collection(collection).document().set(data)
+        return 'I got your details and we will be soon approaching you. Thanks.'
