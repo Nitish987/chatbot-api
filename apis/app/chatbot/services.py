@@ -7,6 +7,12 @@ from common.debug.log import Log
 from firebase_admin import firestore
 
 
+def update_billing(project_id, api_id):
+    requests.put(
+        f'{settings.EXTERNAL_SERVER_HOST_URL}/api/external/v1/import/update-billing/?project_id={project_id}&api_id={api_id}', headers={'ASAK': settings.EXTERNAL_SERVER_API_KEY}
+    )
+
+
 def ai_emform_tool(useEmform: bool, emform: str):
         if useEmform and emform:
             return emform
@@ -36,6 +42,7 @@ class ChatbotService:
         qna_es: list = self.data['data']['qna']
         for qna in qna_es:
             if qna['question'].lower() == query.lower():
+                update_billing(self.project_id, self.api_id)
                 return qna['answer']
         return 'Nothing found!'
 
@@ -84,6 +91,8 @@ class ChatbotService:
                         reply = json.loads(chat.choices[0].message.tool_calls[0].function.arguments)['emform']
                     else:
                         reply = chat.choices[0].message.content
+                    
+                    update_billing(self.project_id, self.api_id)
                     return reply
                 
                 else:
@@ -94,6 +103,8 @@ class ChatbotService:
                         max_tokens=self.data['config']['maxToken']
                     )
                     reply = chat.choices[0].message.content
+
+                    update_billing(self.project_id, self.api_id)
                     return reply
                 
         return 'Nothing found!'
@@ -116,4 +127,5 @@ class ChatbotService:
         collection = f'emform_{self.data['emform']['id']}'
         db = firestore.client()
         db.collection(collection).document().set(data)
+        update_billing(self.project_id, self.api_id)
         return 'I got your details and we will be soon approaching you. Thanks.'
