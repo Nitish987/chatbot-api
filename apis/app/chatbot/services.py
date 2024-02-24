@@ -125,7 +125,8 @@ class ChatbotService:
         return 'Unable to process.'
     
     def emform_submit(self, data: dict):
-        collection = f'emform_{self.data['emform']['id']}'
+        emform_id = self.data['emform']['id']
+        collection = f'emform_{emform_id}'
         db = firestore.client()
         db.collection(collection).document().set(data)
         update_billing(self.project_id, self.data['emform']['api']['id'])

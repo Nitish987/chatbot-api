@@ -133,7 +133,7 @@ JWT_REFRESH_SECRET = getenv('JWT_REFRESH_SECRET')
 SERVER_ENC_KEY = getenv('SERVER_ENC_KEY')
 
 # OpenAI
-openai.api_key = getenv('OPEN_AI')
+openai.api_key = getenv('OPEN_AI_KEY')
 
 # External Server
 
